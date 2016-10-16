@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Predicting Home Runs</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Predicting Home Runs">
+  <meta name="author" content="David Smith">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Predicting Home Runs</h1>
+    <h2></h2>
+    <p>David Smith<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Introduction</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The Shiny application &quot;Predicting Home Runs!&quot; allows a user to enter some information on a hitters season and obtain a prediction of the number of home runs they hit. The application
+relies on a simple linear model and a selection of data from the Lahman database (<a href="http://www.seanlahman.com/baseball-archive/statistics/">http://www.seanlahman.com/baseball-archive/statistics/</a>). </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Filtered Data set</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The Batting data from the Lahman set is filtered to remove years before the Year 2000 and players with under 300 at bats in a season. </p>
+
+<p>This leaves us 3,616 records. Of this we use at bats (AB), runs scored (R), hits (H), walks (BB), runs batted in (RBI), doubles (2B) and triples (3B) to create our linear model. </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Training the model</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">require(Lahman)
+</code></pre>
+
+<pre><code>## Loading required package: Lahman
+</code></pre>
+
+<pre><code class="r">begYear &lt;- 2000
+minAtBats &lt;- 300
+data(Batting)
+dataToUse &lt;- filter(Batting, yearID&gt;=begYear, AB&gt;=minAtBats)
+inTrain &lt;- sample(seq_len(nrow(dataToUse)),size=floor(0.5*nrow(dataToUse)))
+training &lt;- dataToUse[inTrain,]
+testing &lt;- dataToUse[-inTrain,]
+
+modelHR &lt;- lm(HR~AB+R+H+BB+RBI+X2B+X3B,data=training)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Testing the model</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">predictHR &lt;- predict(modelHR, testing)
+
+mean(predictHR-testing$HR)
+</code></pre>
+
+<pre><code>## [1] 0.05566678
+</code></pre>
+
+<p>While our model isn&#39;t perfect (it predicts negative home runs in some cases!), it is fairly close.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Introduction'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Filtered Data set'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Training the model'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Testing the model'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
